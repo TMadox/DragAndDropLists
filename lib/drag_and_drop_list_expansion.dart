@@ -24,17 +24,27 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
 
   /// This function will be called when the expansion of a tile is changed.
   final OnExpansionChanged? onExpansionChanged;
-  
+
   /// The color to display behind the sublist when expanded.
   /// This is kept for backward compatibility, but consider using [expandedBackgroundColor] instead.
   final Color? backgroundColor;
-  
+
   /// The color to display behind the list when expanded.
   final Color? expandedBackgroundColor;
-  
+
   /// The color to display behind the list when collapsed.
   final Color? collapsedBackgroundColor;
-  
+
+  /// The shape of the expansion tile when expanded.
+  final ShapeBorder? expandedShape;
+
+  /// The shape of the expansion tile when collapsed.
+  final ShapeBorder? collapsedShape;
+
+  /// The shape of the expansion tile. This is kept for backward compatibility.
+  /// Consider using [expandedShape] and [collapsedShape] for more control.
+  final ShapeBorder? shape;
+
   @override
   final List<DragAndDropItem>? children;
   final Widget? contentsWhenEmpty;
@@ -66,6 +76,9 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
     this.backgroundColor,
     this.expandedBackgroundColor,
     this.collapsedBackgroundColor,
+    this.expandedShape,
+    this.collapsedShape,
+    this.shape,
     this.onExpansionChanged,
     this.contentsWhenEmpty,
     this.lastTarget,
@@ -91,6 +104,9 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
       backgroundColor: backgroundColor,
       expandedBackgroundColor: expandedBackgroundColor,
       collapsedBackgroundColor: collapsedBackgroundColor,
+      expandedShape: expandedShape,
+      collapsedShape: collapsedShape,
+      shape: shape,
       initiallyExpanded: initiallyExpanded,
       onExpansionChanged: _onSetExpansion,
       key: _expansionKey,
@@ -228,7 +244,8 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   late Timer _expansionTimer;
 
   _startExpansionTimer() async {
-    _expansionTimer = Timer(const Duration(milliseconds: 400), _expansionCallback);
+    _expansionTimer =
+        Timer(const Duration(milliseconds: 400), _expansionCallback);
   }
 
   _stopExpansionTimer() async {

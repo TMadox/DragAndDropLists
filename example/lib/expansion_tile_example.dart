@@ -46,7 +46,8 @@ class _ListTileExample extends State<ExpansionTileExample> {
           padding: const EdgeInsets.symmetric(vertical: 30.0),
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 100.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 100.0),
               decoration: BoxDecoration(
                 border: Border.all(),
                 borderRadius: BorderRadius.circular(7.0),
@@ -61,6 +62,7 @@ class _ListTileExample extends State<ExpansionTileExample> {
 
   _buildList(int outerIndex) {
     var innerList = _lists[outerIndex];
+    // Note: For custom background colors and shapes, see custom_background_expansion_example.dart and shape_example.dart
     return DragAndDropListExpansion(
       title: Text('List ${innerList.name}'),
       subtitle: Text('Subtitle ${innerList.name}'),

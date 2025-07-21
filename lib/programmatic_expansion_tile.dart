@@ -36,6 +36,9 @@ class ProgrammaticExpansionTile extends StatefulWidget {
     this.backgroundColor,
     this.expandedBackgroundColor,
     this.collapsedBackgroundColor,
+    this.expandedShape,
+    this.collapsedShape,
+    this.shape,
     this.onExpansionChanged,
     this.children = const <Widget>[],
     this.trailing,
@@ -86,6 +89,16 @@ class ProgrammaticExpansionTile extends StatefulWidget {
 
   /// The color to display behind the list when collapsed.
   final Color? collapsedBackgroundColor;
+
+  /// The shape of the expansion tile when expanded.
+  final ShapeBorder? expandedShape;
+
+  /// The shape of the expansion tile when collapsed.
+  final ShapeBorder? collapsedShape;
+
+  /// The shape of the expansion tile. This is kept for backward compatibility.
+  /// Consider using [expandedShape] and [collapsedShape] for more control.
+  final ShapeBorder? shape;
 
   /// A widget to display instead of a rotating arrow icon.
   final Widget? trailing;
@@ -203,8 +216,9 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
 
     // Determine the background color based on expansion state and available properties
     Color? finalBackgroundColor;
-    
-    if (widget.expandedBackgroundColor != null || widget.collapsedBackgroundColor != null) {
+
+    if (widget.expandedBackgroundColor != null ||
+        widget.collapsedBackgroundColor != null) {
       // Use the custom background color animation if new properties are available
       finalBackgroundColor = _customBackgroundColor.value ?? Colors.transparent;
     } else if (widget.backgroundColor != null) {
@@ -214,8 +228,33 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
       finalBackgroundColor = Colors.transparent;
     }
 
-    return Container(
-      decoration: BoxDecoration(
+    // Determine the shape based on expansion state and available properties
+    ShapeBorder? finalShape;
+
+    if (widget.expandedShape != null || widget.collapsedShape != null) {
+      // Use state-specific shapes if available
+      if (_isExpanded) {
+        finalShape = widget.expandedShape;
+      } else {
+        finalShape = widget.collapsedShape;
+      }
+    } else if (widget.shape != null) {
+      // Fall back to general shape property
+      finalShape = widget.shape;
+    }
+
+    // Create the base decoration
+    Decoration decoration;
+
+    if (finalShape != null) {
+      // Use ShapeDecoration when a shape is specified
+      decoration = ShapeDecoration(
+        color: finalBackgroundColor,
+        shape: finalShape,
+      );
+    } else {
+      // Use BoxDecoration for backward compatibility
+      decoration = BoxDecoration(
         color: finalBackgroundColor,
         border: setBorder
             ? Border(
@@ -223,7 +262,11 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
                 bottom: BorderSide(color: borderSideColor),
               )
             : null,
-      ),
+      );
+    }
+
+    return Container(
+      decoration: decoration,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -264,9 +307,10 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
     _iconColorTween
       ..begin = theme.unselectedWidgetColor
       ..end = theme.colorScheme.secondary;
-    
+
     // Set up color tweens for the new background color properties
-    if (widget.expandedBackgroundColor != null || widget.collapsedBackgroundColor != null) {
+    if (widget.expandedBackgroundColor != null ||
+        widget.collapsedBackgroundColor != null) {
       _customBackgroundColorTween
         ..begin = widget.collapsedBackgroundColor ?? Colors.transparent
         ..end = widget.expandedBackgroundColor ?? Colors.transparent;
@@ -274,7 +318,7 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
       // Fall back to legacy backgroundColor behavior for backward compatibility
       _backgroundColorTween.end = widget.backgroundColor;
     }
-    
+
     super.didChangeDependencies();
   }
 
