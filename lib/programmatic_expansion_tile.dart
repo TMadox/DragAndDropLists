@@ -34,6 +34,8 @@ class ProgrammaticExpansionTile extends StatefulWidget {
     this.subtitle,
     this.isThreeLine = false,
     this.backgroundColor,
+    this.expandedBackgroundColor,
+    this.collapsedBackgroundColor,
     this.onExpansionChanged,
     this.children = const <Widget>[],
     this.trailing,
@@ -76,7 +78,14 @@ class ProgrammaticExpansionTile extends StatefulWidget {
   final List<Widget?> children;
 
   /// The color to display behind the sublist when expanded.
+  /// This is kept for backward compatibility, but consider using [expandedBackgroundColor] instead.
   final Color? backgroundColor;
+
+  /// The color to display behind the list when expanded.
+  final Color? expandedBackgroundColor;
+
+  /// The color to display behind the list when collapsed.
+  final Color? collapsedBackgroundColor;
 
   /// A widget to display instead of a rotating arrow icon.
   final Widget? trailing;
@@ -105,6 +114,7 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
   final ColorTween _headerColorTween = ColorTween();
   final ColorTween _iconColorTween = ColorTween();
   final ColorTween _backgroundColorTween = ColorTween();
+  final ColorTween _customBackgroundColorTween = ColorTween();
 
   late AnimationController _controller;
   late Animation<double> _iconTurns;
@@ -113,6 +123,7 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
   late Animation<Color?> _headerColor;
   late Animation<Color?> _iconColor;
   late Animation<Color?> _backgroundColor;
+  late Animation<Color?> _customBackgroundColor;
 
   bool _isExpanded = false;
 
@@ -127,6 +138,8 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
     _iconColor = _controller.drive(_iconColorTween.chain(_easeInTween));
     _backgroundColor =
         _controller.drive(_backgroundColorTween.chain(_easeOutTween));
+    _customBackgroundColor =
+        _controller.drive(_customBackgroundColorTween.chain(_easeOutTween));
 
     _isExpanded = PageStorage.of(context)
             .readState(context, identifier: widget.listKey) as bool? ??
@@ -188,9 +201,22 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
     final Color borderSideColor = _borderColor.value ?? Colors.transparent;
     bool setBorder = !widget.disableTopAndBottomBorders;
 
+    // Determine the background color based on expansion state and available properties
+    Color? finalBackgroundColor;
+    
+    if (widget.expandedBackgroundColor != null || widget.collapsedBackgroundColor != null) {
+      // Use the custom background color animation if new properties are available
+      finalBackgroundColor = _customBackgroundColor.value ?? Colors.transparent;
+    } else if (widget.backgroundColor != null) {
+      // Fall back to legacy backgroundColor property (for backward compatibility)
+      finalBackgroundColor = _backgroundColor.value ?? Colors.transparent;
+    } else {
+      finalBackgroundColor = Colors.transparent;
+    }
+
     return Container(
       decoration: BoxDecoration(
-        color: _backgroundColor.value ?? Colors.transparent,
+        color: finalBackgroundColor,
         border: setBorder
             ? Border(
                 top: BorderSide(color: borderSideColor),
@@ -238,7 +264,17 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
     _iconColorTween
       ..begin = theme.unselectedWidgetColor
       ..end = theme.colorScheme.secondary;
-    _backgroundColorTween.end = widget.backgroundColor;
+    
+    // Set up color tweens for the new background color properties
+    if (widget.expandedBackgroundColor != null || widget.collapsedBackgroundColor != null) {
+      _customBackgroundColorTween
+        ..begin = widget.collapsedBackgroundColor ?? Colors.transparent
+        ..end = widget.expandedBackgroundColor ?? Colors.transparent;
+    } else {
+      // Fall back to legacy backgroundColor behavior for backward compatibility
+      _backgroundColorTween.end = widget.backgroundColor;
+    }
+    
     super.didChangeDependencies();
   }
 

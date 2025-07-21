@@ -24,7 +24,17 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
 
   /// This function will be called when the expansion of a tile is changed.
   final OnExpansionChanged? onExpansionChanged;
+  
+  /// The color to display behind the sublist when expanded.
+  /// This is kept for backward compatibility, but consider using [expandedBackgroundColor] instead.
   final Color? backgroundColor;
+  
+  /// The color to display behind the list when expanded.
+  final Color? expandedBackgroundColor;
+  
+  /// The color to display behind the list when collapsed.
+  final Color? collapsedBackgroundColor;
+  
   @override
   final List<DragAndDropItem>? children;
   final Widget? contentsWhenEmpty;
@@ -54,6 +64,8 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
     this.leading,
     this.initiallyExpanded = false,
     this.backgroundColor,
+    this.expandedBackgroundColor,
+    this.collapsedBackgroundColor,
     this.onExpansionChanged,
     this.contentsWhenEmpty,
     this.lastTarget,
@@ -77,6 +89,8 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
       leading: leading,
       disableTopAndBottomBorders: disableTopAndBottomBorders,
       backgroundColor: backgroundColor,
+      expandedBackgroundColor: expandedBackgroundColor,
+      collapsedBackgroundColor: collapsedBackgroundColor,
       initiallyExpanded: initiallyExpanded,
       onExpansionChanged: _onSetExpansion,
       key: _expansionKey,
