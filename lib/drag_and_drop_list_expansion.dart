@@ -169,8 +169,13 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
           child: children![i],
           parameters: parameters,
         ));
-        if (parameters.itemDivider != null && i < children!.length - 1) {
-          contents.add(parameters.itemDivider!);
+        if (i < children!.length - 1) {
+          if (parameters.itemDivider != null) {
+            contents.add(parameters.itemDivider!);
+          } else if (parameters.itemSpacing != null &&
+              parameters.itemSpacing! > 0) {
+            contents.add(SizedBox(height: parameters.itemSpacing));
+          }
         }
       }
       contents.add(DragAndDropItemTarget(

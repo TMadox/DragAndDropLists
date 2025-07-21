@@ -46,7 +46,8 @@ typedef OnItemAdd = void Function(
   int listIndex,
   int newItemIndex,
 );
-typedef OnListAdd = void Function(DragAndDropListInterface newList, int newListIndex);
+typedef OnListAdd = void Function(
+    DragAndDropListInterface newList, int newListIndex);
 typedef OnListReorder = void Function(int oldListIndex, int newListIndex);
 typedef OnListDraggingChanged = void Function(
   DragAndDropListInterface? list,
@@ -178,6 +179,11 @@ class DragAndDropLists extends StatefulWidget {
   /// A widget that will be displayed between each individual item.
   final Widget? itemDivider;
 
+  /// Spacing between individual items within a list. This provides a simple
+  /// way to add uniform spacing without needing to create a custom divider widget.
+  /// If both [itemDivider] and [itemSpacing] are provided, [itemDivider] takes precedence.
+  final double? itemSpacing;
+
   /// The width of a list when dragging.
   final double? listDraggingWidth;
 
@@ -213,6 +219,11 @@ class DragAndDropLists extends StatefulWidget {
 
   /// A widget that will be displayed between each individual list.
   final Widget? listDivider;
+
+  /// Spacing between individual lists. This provides a simple way to add
+  /// uniform spacing without needing to create a custom divider widget.
+  /// If both [listDivider] and [listSpacing] are provided, [listDivider] takes precedence.
+  final double? listSpacing;
 
   /// Whether it should put a divider on the last list or not.
   final bool listDividerOnLastChild;
@@ -279,7 +290,7 @@ class DragAndDropLists extends StatefulWidget {
   /// the vertical axis. By default this is set to true. This may be useful to
   /// disable when setting customDragTargets
   final bool constrainDraggingAxis;
-  
+
   /// If you put a widget before DragAndDropLists there's an unexpected padding
   /// before the list renders. This is the default behaviour for ListView which
   /// is used internally. To remove the padding, set this field to true
@@ -309,6 +320,7 @@ class DragAndDropLists extends StatefulWidget {
     this.itemDragOnLongPress = true,
     this.itemDecorationWhileDragging,
     this.itemDivider,
+    this.itemSpacing,
     this.listDraggingWidth,
     this.listTarget,
     this.listGhost,
@@ -319,6 +331,7 @@ class DragAndDropLists extends StatefulWidget {
     this.listDecorationWhileDragging,
     this.listInnerDecoration,
     this.listDivider,
+    this.listSpacing,
     this.listDividerOnLastChild = true,
     this.listPadding,
     this.contentsWhenEmpty,
@@ -339,9 +352,7 @@ class DragAndDropLists extends StatefulWidget {
     super.key,
   }) {
     if (listGhost == null &&
-        children
-            .whereType<DragAndDropListExpansionInterface>()
-            .isNotEmpty) {
+        children.whereType<DragAndDropListExpansionInterface>().isNotEmpty) {
       throw Exception(
           'If using DragAndDropListExpansion, you must provide a non-null listGhost');
     }
@@ -407,6 +418,7 @@ class DragAndDropListsState extends State<DragAndDropLists> {
       itemTargetOnWillAccept: widget.itemTargetOnWillAccept,
       itemGhostOpacity: widget.itemGhostOpacity,
       itemDivider: widget.itemDivider,
+      itemSpacing: widget.itemSpacing,
       itemDecorationWhileDragging: widget.itemDecorationWhileDragging,
       verticalAlignment: widget.verticalAlignment,
       axis: widget.axis,
@@ -415,6 +427,7 @@ class DragAndDropListsState extends State<DragAndDropLists> {
       listDecorationWhileDragging: widget.listDecorationWhileDragging,
       listInnerDecoration: widget.listInnerDecoration,
       listWidth: widget.listWidth,
+      listSpacing: widget.listSpacing,
       lastItemTargetHeight: widget.lastItemTargetHeight,
       addLastItemTargetHeightToTop: widget.addLastItemTargetHeightToTop,
       listDragHandle: widget.listDragHandle,
@@ -466,7 +479,8 @@ class DragAndDropListsState extends State<DragAndDropLists> {
 
   SliverList _buildSliverList(DragAndDropListTarget dragAndDropListTarget,
       DragAndDropBuilderParameters parameters) {
-    bool includeSeparators = widget.listDivider != null;
+    bool includeSeparators = widget.listDivider != null ||
+        (widget.listSpacing != null && widget.listSpacing! > 0);
     int childrenCount = _calculateChildrenCount(includeSeparators);
 
     return SliverList(
@@ -512,7 +526,8 @@ class DragAndDropListsState extends State<DragAndDropLists> {
 
   List<Widget> _buildOuterList(DragAndDropListTarget dragAndDropListTarget,
       DragAndDropBuilderParameters parameters) {
-    bool includeSeparators = widget.listDivider != null;
+    bool includeSeparators = widget.listDivider != null ||
+        (widget.listSpacing != null && widget.listSpacing! > 0);
     int childrenCount = _calculateChildrenCount(includeSeparators);
 
     return List.generate(childrenCount, (index) {
@@ -540,7 +555,16 @@ class DragAndDropListsState extends State<DragAndDropLists> {
     if (index == childrenCount - 1) {
       return dragAndDropListTarget;
     } else if (includeSeparators && index.isOdd) {
-      return widget.listDivider!;
+      if (widget.listDivider != null) {
+        return widget.listDivider!;
+      } else if (widget.listSpacing != null && widget.listSpacing! > 0) {
+        return SizedBox(
+          height: parameters.axis == Axis.vertical ? widget.listSpacing : null,
+          width: parameters.axis == Axis.horizontal ? widget.listSpacing : null,
+        );
+      } else {
+        return Container(); // Fallback, should not happen
+      }
     } else {
       return DragAndDropListWrapper(
         dragAndDropList:

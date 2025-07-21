@@ -131,8 +131,13 @@ class DragAndDropList implements DragAndDropListInterface {
           child: children[i],
           parameters: parameters,
         ));
-        if (parameters.itemDivider != null && i < children.length - 1) {
-          allChildren.add(parameters.itemDivider!);
+        if (i < children.length - 1) {
+          if (parameters.itemDivider != null) {
+            allChildren.add(parameters.itemDivider!);
+          } else if (parameters.itemSpacing != null &&
+              parameters.itemSpacing! > 0) {
+            allChildren.add(SizedBox(height: parameters.itemSpacing));
+          }
         }
       }
       allChildren.add(DragAndDropItemTarget(

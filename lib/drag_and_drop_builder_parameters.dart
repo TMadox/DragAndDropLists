@@ -40,6 +40,7 @@ class DragAndDropBuilderParameters {
   final Widget? itemGhost;
   final double itemGhostOpacity;
   final Widget? itemDivider;
+  final double? itemSpacing;
   final double? itemDraggingWidth;
   final Decoration? itemDecorationWhileDragging;
   final int listSizeAnimationDuration;
@@ -50,6 +51,7 @@ class DragAndDropBuilderParameters {
   final Decoration? listDecorationWhileDragging;
   final Decoration? listInnerDecoration;
   final double listWidth;
+  final double? listSpacing;
   final double lastItemTargetHeight;
   final bool addLastItemTargetHeightToTop;
   final DragHandle? listDragHandle;
@@ -78,6 +80,7 @@ class DragAndDropBuilderParameters {
     this.itemGhostOpacity = 0.3,
     this.itemGhost,
     this.itemDivider,
+    this.itemSpacing,
     this.itemDraggingWidth,
     this.itemDecorationWhileDragging,
     this.listSizeAnimationDuration = 150,
@@ -88,6 +91,7 @@ class DragAndDropBuilderParameters {
     this.listDecorationWhileDragging,
     this.listInnerDecoration,
     this.listWidth = double.infinity,
+    this.listSpacing,
     this.lastItemTargetHeight = 20,
     this.addLastItemTargetHeightToTop = false,
     this.listDragHandle,
