@@ -62,6 +62,9 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   /// Disable to borders displayed at the top and bottom when expanded
   final bool disableTopAndBottomBorders;
 
+  /// The bottom padding to add to the expansion tile content when expanded
+  final double? bottomPadding;
+
   final ValueNotifier<bool> _expanded = ValueNotifier<bool>(true);
   final GlobalKey<ProgrammaticExpansionTileState> _expansionKey =
       GlobalKey<ProgrammaticExpansionTileState>();
@@ -86,6 +89,7 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
     this.canDrag = true,
     this.key,
     this.disableTopAndBottomBorders = false,
+    this.bottomPadding,
   }) {
     _expanded.value = initiallyExpanded;
   }
@@ -111,6 +115,7 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
       onExpansionChanged: _onSetExpansion,
       key: _expansionKey,
       children: contents,
+      bottomPadding: bottomPadding,
     );
 
     if (params.listDecoration != null) {

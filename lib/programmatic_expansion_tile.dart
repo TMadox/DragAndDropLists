@@ -44,6 +44,7 @@ class ProgrammaticExpansionTile extends StatefulWidget {
     this.trailing,
     this.initiallyExpanded = false,
     this.disableTopAndBottomBorders = false,
+    this.bottomPadding,
   }) : super(key: key);
 
   final Key listKey;
@@ -108,6 +109,9 @@ class ProgrammaticExpansionTile extends StatefulWidget {
 
   /// Disable to borders displayed at the top and bottom when expanded
   final bool disableTopAndBottomBorders;
+
+  /// The bottom padding to add to the expansion tile content when expanded
+  final double? bottomPadding;
 
   @override
   ProgrammaticExpansionTileState createState() =>
@@ -325,10 +329,24 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
   @override
   Widget build(BuildContext context) {
     final bool closed = !_isExpanded && _controller.isDismissed;
+    Widget? childContent;
+
+    if (!closed) {
+      childContent = Column(children: widget.children as List<Widget>);
+
+      // Apply bottom padding if specified
+      if (widget.bottomPadding != null && widget.bottomPadding! > 0) {
+        childContent = Padding(
+          padding: EdgeInsets.only(bottom: widget.bottomPadding!),
+          child: childContent,
+        );
+      }
+    }
+
     return AnimatedBuilder(
       animation: _controller.view,
       builder: _buildChildren,
-      child: closed ? null : Column(children: widget.children as List<Widget>),
+      child: childContent,
     );
   }
 }
