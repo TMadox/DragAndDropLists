@@ -329,24 +329,21 @@ class ProgrammaticExpansionTileState extends State<ProgrammaticExpansionTile>
   @override
   Widget build(BuildContext context) {
     final bool closed = !_isExpanded && _controller.isDismissed;
-    Widget? childContent;
 
-    if (!closed) {
-      childContent = Column(children: widget.children as List<Widget>);
-
-      // Apply bottom padding if specified
-      if (widget.bottomPadding != null && widget.bottomPadding! > 0) {
-        childContent = Padding(
-          padding: EdgeInsets.only(bottom: widget.bottomPadding!),
-          child: childContent,
-        );
-      }
-    }
-
-    return AnimatedBuilder(
+    Widget expansionTile = AnimatedBuilder(
       animation: _controller.view,
       builder: _buildChildren,
-      child: childContent,
+      child: closed ? null : Column(children: widget.children as List<Widget>),
     );
+
+    // Apply bottom padding to the entire expansion tile if specified
+    if (widget.bottomPadding != null && widget.bottomPadding! > 0) {
+      expansionTile = Padding(
+        padding: EdgeInsets.only(bottom: widget.bottomPadding!),
+        child: expansionTile,
+      );
+    }
+
+    return expansionTile;
   }
 }
