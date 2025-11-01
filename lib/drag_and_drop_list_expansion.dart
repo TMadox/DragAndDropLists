@@ -17,6 +17,7 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   final Widget? trailing;
   final Widget? leading;
   final bool initiallyExpanded;
+  final Widget Function(Widget child)? customBuilder;
 
   /// Set this to a unique key that will remain unchanged over the lifetime of the list.
   /// Used to maintain the expanded/collapsed states
@@ -65,6 +66,12 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   /// The bottom padding to add to the expansion tile content when expanded
   final double? bottomPadding;
 
+  /// Optional builder to create a drag feedback widget for the whole expansion tile.
+  /// It receives the original generated expansion widget as `child` and should
+  /// return the widget to use as drag feedback.
+  @override
+  final Widget Function(Widget child)? feedbackBuilder;
+
   final ValueNotifier<bool> _expanded = ValueNotifier<bool>(true);
   final GlobalKey<ProgrammaticExpansionTileState> _expansionKey =
       GlobalKey<ProgrammaticExpansionTileState>();
@@ -72,6 +79,7 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   DragAndDropListExpansion({
     this.children,
     this.title,
+    this.customBuilder,
     this.subtitle,
     this.trailing,
     this.leading,
@@ -85,6 +93,7 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
     this.onExpansionChanged,
     this.contentsWhenEmpty,
     this.lastTarget,
+    this.feedbackBuilder,
     required this.listKey,
     this.canDrag = true,
     this.key,
@@ -97,7 +106,6 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
   @override
   Widget generateWidget(DragAndDropBuilderParameters params) {
     var contents = _generateDragAndDropListInnerContents(params);
-
     Widget expandable = ProgrammaticExpansionTile(
       title: title,
       listKey: listKey,
@@ -114,8 +122,8 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
       initiallyExpanded: initiallyExpanded,
       onExpansionChanged: _onSetExpansion,
       key: _expansionKey,
-      children: contents,
       bottomPadding: bottomPadding,
+      children: contents,
     );
 
     if (params.listDecoration != null) {
@@ -130,6 +138,9 @@ class DragAndDropListExpansion implements DragAndDropListExpansionInterface {
         padding: params.listPadding!,
         child: expandable,
       );
+    }
+    if (customBuilder != null) {
+      expandable = customBuilder!(expandable);
     }
 
     Widget toReturn = ValueListenableBuilder(

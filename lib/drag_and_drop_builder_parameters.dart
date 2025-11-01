@@ -58,6 +58,7 @@ class DragAndDropBuilderParameters {
   final DragHandle? itemDragHandle;
   final bool constrainDraggingAxis;
   final bool disableScrolling;
+  final Color? listBackgroundColor;
 
   DragAndDropBuilderParameters({
     this.onPointerMove,
@@ -98,5 +99,6 @@ class DragAndDropBuilderParameters {
     this.itemDragHandle,
     this.constrainDraggingAxis = true,
     this.disableScrolling = false,
+    this.listBackgroundColor,
   });
 }

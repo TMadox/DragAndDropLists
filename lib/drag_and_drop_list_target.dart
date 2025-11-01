@@ -60,8 +60,9 @@ class _DragAndDropListTarget extends State<DragAndDropListTarget>
     );
 
     if (widget.parameters.listPadding != null) {
-      visibleContents = Padding(
+      visibleContents = Container(
         padding: widget.parameters.listPadding!,
+        color: widget.parameters.listBackgroundColor,
         child: visibleContents,
       );
     }
@@ -82,8 +83,8 @@ class _DragAndDropListTarget extends State<DragAndDropListTarget>
             onWillAcceptWithDetails: (details) {
               bool accept = true;
               if (widget.parameters.listTargetOnWillAccept != null) {
-                accept =
-                    widget.parameters.listTargetOnWillAccept!(details.data, widget);
+                accept = widget.parameters.listTargetOnWillAccept!(
+                    details.data, widget);
               }
               if (accept && mounted) {
                 setState(() {

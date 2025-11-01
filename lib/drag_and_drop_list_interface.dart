@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 abstract class DragAndDropListInterface implements DragAndDropInterface {
   List<DragAndDropItem>? get children;
 
+  /// Optional builder to create a drag feedback widget for the whole list.
+  /// The builder is passed the original generated list widget as `child` and
+  /// should return the widget to be used as feedback. If null, the generated
+  /// widget from `generateWidget` will be used.
+  Widget Function(Widget child)? get feedbackBuilder;
+
   /// Whether or not this item can be dragged.
   /// Set to true if it can be reordered.
   /// Set to false if it must remain fixed.

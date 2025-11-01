@@ -202,8 +202,9 @@ class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
 
     Widget toReturn = stack;
     if (widget.parameters.listPadding != null) {
-      toReturn = Padding(
+      toReturn = Container(
         padding: widget.parameters.listPadding!,
+        color: widget.parameters.listBackgroundColor,
         child: stack,
       );
     }
@@ -221,6 +222,15 @@ class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
 
   Material buildFeedbackWithHandle(
       Widget dragAndDropListContents, Widget dragHandle) {
+    final child = Directionality(
+      textDirection: Directionality.of(context),
+      child: dragAndDropListContents,
+    );
+
+    final content = widget.dragAndDropList.feedbackBuilder != null
+        ? widget.dragAndDropList.feedbackBuilder!(child)
+        : child;
+
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -229,10 +239,7 @@ class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
           width: widget.parameters.listDraggingWidth ?? _containerSize.width,
           child: Stack(
             children: [
-              Directionality(
-                textDirection: Directionality.of(context),
-                child: dragAndDropListContents,
-              ),
+              content,
               Positioned(
                 right: widget.parameters.listDragHandle!.onLeft ? null : 0,
                 left: widget.parameters.listDragHandle!.onLeft ? 0 : null,
@@ -265,10 +272,17 @@ class _DragAndDropListWrapper extends State<DragAndDropListWrapper>
         color: Colors.transparent,
         child: Container(
           decoration: widget.parameters.listDecorationWhileDragging,
-          child: Directionality(
-            textDirection: Directionality.of(context),
-            child: dragAndDropListContents,
-          ),
+          child: widget.dragAndDropList.feedbackBuilder != null
+              ? widget.dragAndDropList.feedbackBuilder!(
+                  Directionality(
+                    textDirection: Directionality.of(context),
+                    child: dragAndDropListContents,
+                  ),
+                )
+              : Directionality(
+                  textDirection: Directionality.of(context),
+                  child: dragAndDropListContents,
+                ),
         ),
       ),
     );

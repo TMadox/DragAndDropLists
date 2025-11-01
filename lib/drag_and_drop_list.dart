@@ -49,11 +49,18 @@ class DragAndDropList implements DragAndDropListInterface {
   /// Set to false if it must remain fixed.
   @override
   final bool canDrag;
+
+  /// Optional builder to create a drag feedback widget for the whole list.
+  /// Provided the generated list widget as `child` and returns a widget to
+  /// show while dragging.
+  @override
+  final Widget Function(Widget child)? feedbackBuilder;
   @override
   final Key? key;
   DragAndDropList({
     required this.children,
     this.key,
+    this.feedbackBuilder,
     this.header,
     this.footer,
     this.leftSide,

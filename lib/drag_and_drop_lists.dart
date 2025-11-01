@@ -231,6 +231,9 @@ class DragAndDropLists extends StatefulWidget {
   /// The padding between each individual list.
   final EdgeInsets? listPadding;
 
+  /// The background color for the list area including padding.
+  final Color? listBackgroundColor;
+
   /// A widget that will be displayed whenever a list contains no items.
   final Widget? contentsWhenEmpty;
 
@@ -334,6 +337,7 @@ class DragAndDropLists extends StatefulWidget {
     this.listSpacing,
     this.listDividerOnLastChild = true,
     this.listPadding,
+    this.listBackgroundColor,
     this.contentsWhenEmpty,
     this.listWidth = double.infinity,
     this.lastItemTargetHeight = 20,
@@ -434,6 +438,7 @@ class DragAndDropListsState extends State<DragAndDropLists> {
       itemDragHandle: widget.itemDragHandle,
       constrainDraggingAxis: widget.constrainDraggingAxis,
       disableScrolling: widget.disableScrolling,
+      listBackgroundColor: widget.listBackgroundColor,
     );
 
     DragAndDropListTarget dragAndDropListTarget = DragAndDropListTarget(
